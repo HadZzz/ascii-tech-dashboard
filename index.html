@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ASCII Tech Dashboard - Professional Monitoring System</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+      color: #00ff41;
+      font-family: 'Courier New', monospace;
+      padding: 0;
+      line-height: 1.4;
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    /* Dashboard Layout */
+    .dashboard {
+      display: grid;
+      grid-template-columns: 250px 1fr 300px;
+      grid-template-rows: 60px 1fr;
+      height: 100vh;
+      gap: 2px;
+      background: #000;
+    }
+
+    .header {
+      grid-column: 1 / -1;
+      background: linear-gradient(90deg, #1a1a2e, #16213e);
+      border-bottom: 2px solid #00ff41;
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      box-shadow: 0 2px 10px rgba(0, 255, 65, 0.3);
+    }
+
+    .sidebar {
+      background: rgba(26, 26, 46, 0.9);
+      border-right: 1px solid #00ff41;
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    .main-content {
+      background: rgba(10, 10, 10, 0.95);
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    .right-panel {
+      background: rgba(26, 26, 46, 0.9);
+      border-left: 1px solid #00ff41;
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    .widget {
+      background: rgba(0, 255, 65, 0.05);
+      border: 1px solid #00ff41;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 20px;
+      box-shadow: 0 0 15px rgba(0, 255, 65, 0.1);
+    }
+
+    .widget h3 {
+      color: #00ffff;
+      margin-bottom: 10px;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    pre {
+      font-family: 'Courier New', monospace;
+      font-size: 11px;
+      line-height: 1.1;
+      white-space: pre;
+      overflow-x: auto;
+      margin: 0;
+    }
+
+    /* Terminal Styles */
+    .terminal {
+      background: #000;
+      border: 1px solid #00ff41;
+      border-radius: 5px;
+      padding: 10px;
+      height: 200px;
+      overflow-y: auto;
+      font-size: 12px;
+    }
+
+    .terminal-input {
+      background: transparent;
+      border: none;
+      color: #00ff41;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      width: 100%;
+      outline: none;
+    }
+
+    /* Chart Styles */
+    .chart {
+      height: 100px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .bar {
+      display: inline-block;
+      width: 8px;
+      margin: 0 1px;
+      background: linear-gradient(to top, #00ff41, #00aa2a);
+      animation: bar-grow 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes bar-grow {
+      0% { height: 10%; }
+      100% { height: var(--height, 50%); }
+    }
+
+    /* Status Indicators */
+    .status-online { color: #00ff41; }
+    .status-warning { color: #ffaa00; }
+    .status-error { color: #ff4444; }
+    .status-info { color: #00aaff; }
+
+    /* Glitch Effect */
+    .glitch {
+      animation: glitch 2s infinite;
+    }
+
+    @keyframes glitch {
+      0%, 100% { transform: translate(0); }
+      20% { transform: translate(-2px, 2px); }
+      40% { transform: translate(-2px, -2px); }
+      60% { transform: translate(2px, 2px); }
+      80% { transform: translate(2px, -2px); }
+    }
+
+    /* Neon Glow */
+    .neon {
+      text-shadow: 0 0 5px #00ff41, 0 0 10px #00ff41, 0 0 15px #00ff41;
+      animation: neon-pulse 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes neon-pulse {
+      from { text-shadow: 0 0 5px #00ff41, 0 0 10px #00ff41, 0 0 15px #00ff41; }
+      to { text-shadow: 0 0 2px #00ff41, 0 0 5px #00ff41, 0 0 8px #00ff41; }
+    }
+
+    /* Loading Spinner */
+    .spinner::after {
+      content: '|';
+      animation: spin 0.5s linear infinite;
+      font-size: 24px;
+      color: #ffff00;
+    }
+
+    @keyframes spin {
+      0% { content: '|'; }
+      25% { content: '/'; }
+      50% { content: '-'; }
+      75% { content: '\\'; }
+      100% { content: '|'; }
+    }
+
+    /* Walking Character */
+    .walker::after {
+      content: 'o-|-<';
+      animation: walk 1s linear infinite;
+      font-size: 16px;
+    }
+
+    @keyframes walk {
+      0% { content: '  o\n /|\\\n / \\'; }
+      25% { content: ' \\o/\n  |\n / \\'; }
+      50% { content: '  o\n /|\\\n<  >'; }
+      75% { content: ' /o\\\n  |\n / \\'; }
+      100% { content: '  o\n /|\\\n / \\'; }
+    }
+
+    /* Wave Animation */
+    .wave::after {
+      content: '~~~~~~~~~~~~~~~~~~~~~';
+      animation: wave 1.5s ease-in-out infinite;
+      color: #0088ff;
+    }
+
+    @keyframes wave {
+      0% { content: '~~~~~~~~~~~~~~~~~~~~~'; }
+      25% { content: '~~^~~^~~^~~^~~^~~^~~^'; }
+      50% { content: '^~^~^~^~^~^~^~^~^~^~^'; }
+      75% { content: '~~v~~v~~v~~v~~v~~v~~v'; }
+      100% { content: '~~~~~~~~~~~~~~~~~~~~~'; }
+    }
+
+    /* Bouncing Ball */
+    .ball {
+      animation: bounce 1s ease-in-out infinite;
+      color: #ff6600;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-30px); }
+    }
+
+    /* Matrix Rain Effect */
+    .matrix-container {
+      height: 200px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .matrix-column {
+      position: absolute;
+      top: 0;
+      font-size: 12px;
+      animation: matrix-fall 3s linear infinite;
+      color: #00ff00;
+    }
+
+    @keyframes matrix-fall {
+      0% { transform: translateY(-100%); opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { transform: translateY(300px); opacity: 0; }
+    }
+
+    /* Clock Animation */
+    .clock::after {
+      content: '12:00:00';
+      animation: tick 1s linear infinite;
+      color: #ff0088;
+      font-size: 20px;
+    }
+
+    /* Progress Bar */
+    .progress::after {
+      content: '[          ]';
+      animation: progress 3s ease-in-out infinite;
+      color: #88ff00;
+    }
+
+    @keyframes progress {
+      0% { content: '[          ] 0%'; }
+      10% { content: '[█         ] 10%'; }
+      20% { content: '[██        ] 20%'; }
+      30% { content: '[███       ] 30%'; }
+      40% { content: '[████      ] 40%'; }
+      50% { content: '[█████     ] 50%'; }
+      60% { content: '[██████    ] 60%'; }
+      70% { content: '[███████   ] 70%'; }
+      80% { content: '[████████  ] 80%'; }
+      90% { content: '[█████████ ] 90%'; }
+      100% { content: '[██████████] 100%'; }
+    }
+
+    /* Heart Beat */
+    .heart {
+      animation: heartbeat 1.5s ease-in-out infinite;
+      color: #ff0066;
+      font-size: 24px;
+    }
+
+    @keyframes heartbeat {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.3); }
+    }
+
+    /* Typing Effect */
+    .typing::after {
+      content: '';
+      animation: typing 4s steps(40) infinite;
+      border-right: 2px solid #00ff00;
+    }
+
+    @keyframes typing {
+      0% { content: ''; }
+      25% { content: 'Hello World...'; }
+      50% { content: 'ASCII is awesome!'; }
+      75% { content: 'Creating animations...'; }
+      100% { content: 'Done! '; }
+    }
+
+    /* Zipper Animation */
+    .zipper-container {
+      background: #001122;
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+    }
+
+    #zipper {
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      line-height: 1.1;
+      color: #888;
+      display: block;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="dashboard">
+    <!-- Header -->
+    <div class="header">
+      <h1 class="neon" style="margin: 0; font-size: 20px;">
+        ⚡ ASCII TECH DASHBOARD v2.1.0
+      </h1>
+      <div style="margin-left: auto; display: flex; gap: 20px;">
+        <span class="status-online">● ONLINE</span>
+        <span id="current-time"></span>
+      </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="widget">
+        <h3>🖥️ System Status</h3>
+        <pre id="system-status">CPU: <span class="status-online">██████████</span> 67%
+MEM: <span class="status-warning">████████░░</span> 82%
+DSK: <span class="status-online">██████░░░░</span> 45%
+NET: <span class="status-info">████████░░</span> 78%</pre>
+      </div>
+
+      <div class="widget">
+        <h3>📊 Performance</h3>
+        <div class="chart" id="performance-chart">
+          <div class="bar" style="--height: 60%;"></div>
+          <div class="bar" style="--height: 45%;"></div>
+          <div class="bar" style="--height: 78%;"></div>
+          <div class="bar" style="--height: 34%;"></div>
+          <div class="bar" style="--height: 89%;"></div>
+          <div class="bar" style="--height: 56%;"></div>
+          <div class="bar" style="--height: 67%;"></div>
+          <div class="bar" style="--height: 43%;"></div>
+        </div>
+      </div>
+
+      <div class="widget">
+        <h3>🌐 Network</h3>
+        <pre id="network-status">┌─ eth0 ─────────────┐
+│ ↑ 1.2 MB/s        │
+│ ↓ 3.4 MB/s        │
+│ Packets: 1,247,891 │
+└────────────────────┘</pre>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <div class="widget">
+        <h3>💻 Interactive Terminal</h3>
+        <div class="terminal" id="terminal">
+          <div>ASCII Tech Dashboard Terminal v2.1.0</div>
+          <div>Type 'help' for available commands</div>
+          <div>───────────────────────────────────────</div>
+          <div id="terminal-output"></div>
+          <div style="display: flex;">
+            <span style="color: #00ff41;">root@dashboard:~$ </span>
+            <input type="text" class="terminal-input" id="terminal-input" placeholder="Enter command...">
+          </div>
+        </div>
+      </div>
+
+      <div class="widget">
+        <h3>🔥 Real-time ASCII Visualizations</h3>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+          <div>
+            <h4 style="color: #00aaff; margin-bottom: 10px;">CPU Load</h4>
+            <pre id="cpu-visualization">████████████████████
+████████████████████
+██████████████░░░░░░
+████████████░░░░░░░░
+██████████░░░░░░░░░░
+████████░░░░░░░░░░░░</pre>
+          </div>
+          <div>
+            <h4 style="color: #ffaa00; margin-bottom: 10px;">Network Traffic</h4>
+            <pre id="network-visualization">↑ ████████████░░░░░░
+↓ ██████████████████
+↑ ██████░░░░░░░░░░░░
+↓ ████████████░░░░░░
+↑ ████████░░░░░░░░░░
+↓ ██████████████████</pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="widget">
+        <h3>🎯 System Processes</h3>
+        <pre id="process-list">PID    NAME           CPU%   MEM%   STATUS
+─────  ─────────────  ─────  ─────  ──────────
+1247   chrome.exe     <span class="status-warning">23.4%</span>  <span class="status-error">45.2%</span>  <span class="status-online">RUNNING</span>
+2891   node.js        <span class="status-online">12.1%</span>  <span class="status-online">8.7%</span>   <span class="status-online">RUNNING</span>
+3456   vscode.exe     <span class="status-info">8.9%</span>   <span class="status-warning">32.1%</span>  <span class="status-online">RUNNING</span>
+4123   system         <span class="status-online">2.3%</span>   <span class="status-online">5.4%</span>   <span class="status-online">RUNNING</span>
+5678   dashboard.js   <span class="status-online">1.2%</span>   <span class="status-online">3.8%</span>   <span class="status-online">RUNNING</span></pre>
+      </div>
+    </div>
+
+    <!-- Right Panel -->
+    <div class="right-panel">
+      <div class="widget">
+        <h3>🚀 Server Status</h3>
+        <pre id="server-status">┌─ Production Servers ─┐
+│ <span class="status-online">●</span> web-01    <span class="status-online">ONLINE</span>   │
+│ <span class="status-online">●</span> web-02    <span class="status-online">ONLINE</span>   │
+│ <span class="status-warning">●</span> db-01     <span class="status-warning">WARNING</span> │
+│ <span class="status-online">●</span> cache-01  <span class="status-online">ONLINE</span>   │
+└───────────────────────┘</pre>
+      </div>
+
+      <div class="widget">
+        <h3>📡 Live Data Stream</h3>
+        <div class="terminal" style="height: 150px;" id="data-stream">
+          <div id="stream-content"></div>
+        </div>
+      </div>
+
+      <div class="widget">
+        <h3>🎮 ASCII Animations</h3>
+        <div style="text-align: center;">
+          <div>Loading: <span class="spinner"></span></div>
+          <br>
+          <div><span class="walker"></span></div>
+          <br>
+          <div class="wave"></div>
+          <br>
+          <div class="ball">●</div>
+        </div>
+      </div>
+
+      <div class="widget">
+        <h3>🔐 Security Log</h3>
+        <pre id="security-log"><span class="status-online">[OK]</span> Login: admin@192.168.1.100
+<span class="status-info">[INFO]</span> Session started
+<span class="status-warning">[WARN]</span> Failed login attempt
+<span class="status-online">[OK]</span> Firewall updated
+<span class="status-error">[ERR]</span> Suspicious activity</pre>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Dashboard Core Functions
+    function updateTime() {
+      const now = new Date();
+      document.getElementById('current-time').textContent = now.toLocaleTimeString();
+    }
+
+    // System Status Updates
+    function updateSystemStatus() {
+      const cpuUsage = Math.floor(Math.random() * 40) + 40;
+      const memUsage = Math.floor(Math.random() * 30) + 60;
+      const diskUsage = Math.floor(Math.random() * 20) + 30;
+      const netUsage = Math.floor(Math.random() * 40) + 50;
+
+      const systemStatus = document.getElementById('system-status');
+      systemStatus.innerHTML = `CPU: <span class="status-${cpuUsage > 80 ? 'error' : cpuUsage > 60 ? 'warning' : 'online'}">█${'█'.repeat(Math.floor(cpuUsage/10))}${'░'.repeat(10-Math.floor(cpuUsage/10))}</span> ${cpuUsage}%
+MEM: <span class="status-${memUsage > 85 ? 'error' : memUsage > 70 ? 'warning' : 'online'}">█${'█'.repeat(Math.floor(memUsage/10))}${'░'.repeat(10-Math.floor(memUsage/10))}</span> ${memUsage}%
+DSK: <span class="status-${diskUsage > 90 ? 'error' : diskUsage > 70 ? 'warning' : 'online'}">█${'█'.repeat(Math.floor(diskUsage/10))}${'░'.repeat(10-Math.floor(diskUsage/10))}</span> ${diskUsage}%
+NET: <span class="status-info">█${'█'.repeat(Math.floor(netUsage/10))}${'░'.repeat(10-Math.floor(netUsage/10))}</span> ${netUsage}%`;
+    }
+
+    // Terminal Commands
+    const terminalCommands = {
+      help: () => 'Available commands: help, status, clear, ps, top, ping, ls, whoami, date, uptime',
+      status: () => 'System Status: All services running normally',
+      clear: () => { document.getElementById('terminal-output').innerHTML = ''; return ''; },
+      ps: () => 'PID  COMMAND\n1247 chrome.exe\n2891 node.js\n3456 vscode.exe',
+      top: () => 'CPU Usage: 67% | Memory: 82% | Load: 1.23',
+      ping: () => 'PING google.com: 64 bytes time=12ms TTL=64',
+      ls: () => 'dashboard.js  config.json  logs/  data/',
+      whoami: () => 'root',
+      date: () => new Date().toString(),
+      uptime: () => 'System uptime: 7 days, 14 hours, 23 minutes'
+    };
+
+    function handleTerminalInput() {
+      const input = document.getElementById('terminal-input');
+      const output = document.getElementById('terminal-output');
+      const command = input.value.trim().toLowerCase();
+      
+      if (command) {
+        output.innerHTML += `<div style="color: #00ff41;">root@dashboard:~$ ${input.value}</div>`;
+        
+        if (terminalCommands[command]) {
+          const result = terminalCommands[command]();
+          if (result) {
+            output.innerHTML += `<div style="color: #ffffff;">${result}</div>`;
+          }
+        } else {
+          output.innerHTML += `<div style="color: #ff4444;">Command not found: ${command}</div>`;
+        }
+        
+        output.scrollTop = output.scrollHeight;
+      }
+      
+      input.value = '';
+    }
+
+    // Live Data Stream
+    function updateDataStream() {
+      const streamContent = document.getElementById('stream-content');
+      const timestamp = new Date().toLocaleTimeString();
+      const events = [
+        'User login detected',
+        'Database query executed',
+        'Cache updated',
+        'API request processed',
+        'File uploaded',
+        'Backup completed',
+        'Security scan finished'
+      ];
+      
+      const randomEvent = events[Math.floor(Math.random() * events.length)];
+      const newLine = `<div>[${timestamp}] ${randomEvent}</div>`;
+      
+      streamContent.innerHTML += newLine;
+      streamContent.scrollTop = streamContent.scrollHeight;
+      
+      // Keep only last 10 lines
+      const lines = streamContent.children;
+      if (lines.length > 10) {
+        streamContent.removeChild(lines[0]);
+      }
+    }
+
+    // CPU Visualization Update
+    function updateCPUVisualization() {
+      const cpuViz = document.getElementById('cpu-visualization');
+      let visualization = '';
+      
+      for (let i = 0; i < 6; i++) {
+        const usage = Math.floor(Math.random() * 20) + 1;
+        const filled = '█'.repeat(usage);
+        const empty = '░'.repeat(20 - usage);
+        visualization += filled + empty + '\n';
+      }
+      
+      cpuViz.textContent = visualization;
+    }
+
+    // Network Visualization Update
+    function updateNetworkVisualization() {
+      const netViz = document.getElementById('network-visualization');
+      let visualization = '';
+      
+      for (let i = 0; i < 6; i++) {
+        const direction = i % 2 === 0 ? '↑' : '↓';
+        const usage = Math.floor(Math.random() * 16) + 4;
+        const filled = '█'.repeat(usage);
+        const empty = '░'.repeat(20 - usage);
+        visualization += `${direction} ${filled}${empty}\n`;
+      }
+      
+      netViz.textContent = visualization;
+    }
+
+    // Clock Animation
+    function updateClock() {
+      const clockElements = document.querySelectorAll('.clock::after');
+      const now = new Date();
+      const time = now.toLocaleTimeString();
+      
+      // Update clock display via CSS custom property
+      document.documentElement.style.setProperty('--clock-time', `"${time}"`);
+    }
+
+    // Rocket Animation
+    function animateRocket() {
+      const rocket = document.getElementById('rocket');
+      let position = 0;
+      
+      setInterval(() => {
+        position += 2;
+        if (position > 300) position = 0;
+        rocket.style.transform = `translateY(-${position}px)`;
+      }, 100);
+    }
+
+    // Zipper Animation
+    function animateZipper() {
+      const zipper = document.getElementById('zipper');
+      const frames = [
+        // Frame 1 - Closed zipper
+        `|||||||||||||||||||||
+|||||||||||||||||||||
+|||||||||||||||||||||
+|||||||||||||||||||||
+|||||||||||||||||||||
+|||||||||||||||||||||
+|||||||||||||||||||||
+|||||||||||||||||||||
+|||||||||||||||||||||
+|||||||||||||||||||||
+|||||||||||||||||||||
+|||||||||||||||||||||`,
+        
+        // Frame 2 - Starting to open
+        `|||||||||||▼|||||||||
+|||||||||||||||||||||
+|||||||||||||||||||||
+|||||||||||||||||||||
+|||||||||||||||||||||
+|||||||||||||||||||||
+|||||||||||||||||||||
+|||||||||||||||||||||
+|||||||||||||||||||||
+|||||||||||||||||||||
+|||||||||||||||||||||
+|||||||||||||||||||||`,
+        
+        // Frame 3 - Opening more
+        `||||||||||  ||||||||||
+|||||||||||▼|||||||||
+|||||||||||||||||||||
+|||||||||||||||||||||
+|||||||||||||||||||||
+|||||||||||||||||||||
+|||||||||||||||||||||
+|||||||||||||||||||||
+|||||||||||||||||||||
+|||||||||||||||||||||
+|||||||||||||||||||||
+|||||||||||||||||||||`,
+        
+        // Frame 4 - More open
+        `|||||||||    |||||||||
+||||||||||  ||||||||||
+|||||||||||▼|||||||||
+|||||||||||||||||||||
+|||||||||||||||||||||
+|||||||||||||||||||||
+|||||||||||||||||||||
+|||||||||||||||||||||
+|||||||||||||||||||||
+|||||||||||||||||||||
+|||||||||||||||||||||
+|||||||||||||||||||||`,
+        
+        // Frame 5 - Half open
+        `||||||||      ||||||||
+|||||||||    |||||||||
+||||||||||  ||||||||||
+|||||||||||▼|||||||||
+|||||||||||||||||||||
+|||||||||||||||||||||
+|||||||||||||||||||||
+|||||||||||||||||||||
+|||||||||||||||||||||
+|||||||||||||||||||||
+|||||||||||||||||||||
+|||||||||||||||||||||`,
+        
+        // Frame 6 - More open
+        `|||||||        |||||||
+||||||||      ||||||||
+|||||||||    |||||||||
+||||||||||  ||||||||||
+|||||||||||▼|||||||||
+|||||||||||||||||||||
+|||||||||||||||||||||
+|||||||||||||||||||||
+|||||||||||||||||||||
+|||||||||||||||||||||
+|||||||||||||||||||||
+|||||||||||||||||||||`,
+        
+        // Frame 7 - Almost fully open
+        `||||||          ||||||
+|||||||        |||||||
+||||||||      ||||||||
+|||||||||    |||||||||
+||||||||||  ||||||||||
+|||||||||||▼|||||||||
+|||||||||||||||||||||
+|||||||||||||||||||||
+|||||||||||||||||||||
+|||||||||||||||||||||
+|||||||||||||||||||||
+|||||||||||||||||||||`,
+        
+        // Frame 8 - Fully open top
+        `|||||            |||||
+||||||          ||||||
+|||||||        |||||||
+||||||||      ||||||||
+|||||||||    |||||||||
+||||||||||  ||||||||||
+|||||||||||▼|||||||||
+|||||||||||||||||||||
+|||||||||||||||||||||
+|||||||||||||||||||||
+|||||||||||||||||||||
+|||||||||||||||||||||`,
+        
+        // Frame 9 - Opening middle
+        `||||              ||||
+|||||            |||||
+||||||          ||||||
+|||||||        |||||||
+||||||||      ||||||||
+|||||||||    |||||||||
+||||||||||  ||||||||||
+|||||||||||▼|||||||||
+|||||||||||||||||||||
+|||||||||||||||||||||
+|||||||||||||||||||||
+|||||||||||||||||||||`,
+        
+        // Frame 10 - More open
+        `|||                |||
+||||              ||||
+|||||            |||||
+||||||          ||||||
+|||||||        |||||||
+||||||||      ||||||||
+|||||||||    |||||||||
+||||||||||  ||||||||||
+|||||||||||▼|||||||||
+|||||||||||||||||||||
+|||||||||||||||||||||
+|||||||||||||||||||||`,
+        
+        // Frame 11 - Almost fully open
+        `||                  ||
+|||                |||
+||||              ||||
+|||||            |||||
+||||||          ||||||
+|||||||        |||||||
+||||||||      ||||||||
+|||||||||    |||||||||
+||||||||||  ||||||||||
+|||||||||||▼|||||||||
+|||||||||||||||||||||
+|||||||||||||||||||||`,
+        
+        // Frame 12 - Fully open
+        `|                    |
+||                  ||
+|||                |||
+||||              ||||
+|||||            |||||
+||||||          ||||||
+|||||||        |||||||
+||||||||      ||||||||
+|||||||||    |||||||||
+||||||||||  ||||||||||
+|||||||||||▼|||||||||
+|||||||||||||||||||||`,
+        
+        // Frame 13 - Completely open
+        `                      
+|                    |
+||                  ||
+|||                |||
+||||              ||||
+|||||            |||||
+||||||          ||||||
+|||||||        |||||||
+||||||||      ||||||||
+|||||||||    |||||||||
+||||||||||  ||||||||||
+|||||||||||▼|||||||||`
+      ];
+      
+      let currentFrame = 0;
+      
+      setInterval(() => {
+        zipper.textContent = frames[currentFrame];
+        currentFrame = (currentFrame + 1) % frames.length;
+        
+        // Add color effects
+        if (currentFrame < 3) {
+          zipper.style.color = '#888';
+        } else if (currentFrame < 8) {
+          zipper.style.color = '#00ff88';
+        } else {
+          zipper.style.color = '#88ff00';
+        }
+      }, 300);
+    }
+
+    // Initialize Dashboard
+    function initDashboard() {
+      // Set up event listeners
+      document.getElementById('terminal-input').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          handleTerminalInput();
+        }
+      });
+
+      // Start all intervals
+      setInterval(updateTime, 1000);
+      setInterval(updateSystemStatus, 3000);
+      setInterval(updateDataStream, 2000);
+      setInterval(updateCPUVisualization, 1500);
+      setInterval(updateNetworkVisualization, 2500);
+
+      // Initial updates
+      updateTime();
+      updateSystemStatus();
+      updateDataStream();
+      updateCPUVisualization();
+      updateNetworkVisualization();
+    }
+
+    // Start dashboard when page loads
+    document.addEventListener('DOMContentLoaded', initDashboard);
+
+    // Add some interactive effects
+    document.addEventListener('click', function(e) {
+      // Create sparkle effect on click
+      const sparkle = document.createElement('div');
+      sparkle.innerHTML = '✨';
+      sparkle.style.position = 'fixed';
+      sparkle.style.left = e.clientX + 'px';
+      sparkle.style.top = e.clientY + 'px';
+      sparkle.style.pointerEvents = 'none';
+      sparkle.style.animation = 'sparkle 1s ease-out forwards';
+      sparkle.style.zIndex = '1000';
+      document.body.appendChild(sparkle);
+      
+      setTimeout(() => sparkle.remove(), 1000);
+    });
+
+    // Add sparkle animation
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes sparkle {
+        0% { transform: scale(0) rotate(0deg); opacity: 1; }
+        100% { transform: scale(2) rotate(180deg); opacity: 0; }
+      }
+    `;
+    document.head.appendChild(style);
+  </script>
+</body>
+</html>
